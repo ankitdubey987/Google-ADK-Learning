@@ -6,7 +6,7 @@ from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import BaseTool, ToolContext
 from google.adk.tools.langchain_tool import LangchainTool
 from langchain_community.tools import DuckDuckGoSearchResults
-from core_utils.util import get_logger
+from ..core_utils.util import get_logger
 
 logger = get_logger(__name__)
 

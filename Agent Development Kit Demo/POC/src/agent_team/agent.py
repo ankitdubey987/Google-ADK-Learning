@@ -1,14 +1,14 @@
 import asyncio
 import warnings
 
-import tools_util
+from . import tools_util
 from google.adk import Agent
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types  # For creating message Content/Parts
 
-from core_utils.util import get_logger
+from .core_utils.util import get_logger
 
 warnings.filterwarnings("ignore")
 
@@ -210,6 +210,9 @@ if root_agent_var_name in globals() and globals()[root_agent_var_name]:
                 break
         logger.info("-- Agent Team Delegation Test Completed --")
 
+def main():
+    asyncio.run(run_team_conversation())
+
 if __name__ == "__main__":
     # asyncio.run(run_conversation())
-    asyncio.run(run_team_conversation())
+    main()
