@@ -1,0 +1,10 @@
+Tools Supporting Models:
+cogito:8b
+mistral-nemo:latest 
+phi4-mini:latest
+mistral:7b
+llama3.1:8b
+qwen3:8b (Thinking, tools, completion)
+
+Vision Supporting Models:
+qwen2.5vl:latest
