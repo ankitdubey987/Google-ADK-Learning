@@ -3,7 +3,7 @@ from typing import Optional
 
 from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.utilities.duckduckgo_search import DuckDuckGoSearchAPIWrapper
-from ..core_utils.util import get_logger
+from core_utils.util import get_logger
 
 logger = get_logger(__name__)
 

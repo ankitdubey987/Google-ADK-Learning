@@ -9,7 +9,7 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types
 from langchain_community.tools import DuckDuckGoSearchResults
 
-from .core_utils.util import get_logger
+from core_utils.util import get_logger
 
 logger = get_logger(__name__)
 

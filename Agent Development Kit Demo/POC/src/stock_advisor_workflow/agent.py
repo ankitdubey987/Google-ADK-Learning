@@ -4,7 +4,7 @@ from .subagents import summarizer_agent, parallel_agent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
-from .core_utils.util import get_logger
+from core_utils.util import get_logger
 
 logger = get_logger(__name__)
 

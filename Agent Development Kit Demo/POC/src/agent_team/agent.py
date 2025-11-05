@@ -8,7 +8,7 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types  # For creating message Content/Parts
 
-from .core_utils.util import get_logger
+from core_utils.util import get_logger
 
 warnings.filterwarnings("ignore")
 
