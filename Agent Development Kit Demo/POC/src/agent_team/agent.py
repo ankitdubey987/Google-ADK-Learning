@@ -1,14 +1,15 @@
 import asyncio
 import warnings
 
-from . import tools_util
 from google.adk import Agent
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
+from google.adk.sessions import DatabaseSessionService, InMemorySessionService
 from google.genai import types  # For creating message Content/Parts
 
 from core_utils.util import get_logger
+
+from agent_team.tools_util import basic_tools
 
 warnings.filterwarnings("ignore")
 
@@ -31,7 +32,7 @@ try:
         model=get_model(QWEN_8B),
         description="Provides weather information for specific cities.",
         instruction="You are a helpful weather assistant. When the user asks for the weather in a specific city, use the `get_weather` tool to find the information. If the tool returns an error, inform the user politely. If the tool is successful, present the weather report clearly.",
-        tools=[tools_util.get_weather],
+        tools=[basic_tools.get_weather],
     )
     logger.info(
         "Agent created: %s using model: %s", weather_agent.name, weather_agent.model
@@ -45,7 +46,7 @@ try:
         model=get_model(QWEN_8B),
         description="Handles simple greetings and hellos using the `say_hello` tool.",
         instruction="You are the Greeting Agent. Your ONLY task is to provide a friendly greeting to the user. Use the `say_hello` tool to generate the greeting. If the user provides their name, make sure to pass it to the tool. Do not engage in any other conversation or tasks.",
-        tools=[tools_util.say_hello],
+        tools=[basic_tools.say_hello],
     )
     logger.info(
         "Agent created: %s using model: %s", greeting_agent.name, greeting_agent.model
@@ -59,7 +60,7 @@ try:
         model=get_model(QWEN_8B),
         description="Handles simple goodbyes and farewells using the `say_goodbye` tool.",
         instruction="You are the Farewell Agent. Your ONLY task is to provide a friendly farewell to the user. Use the `say_goodbye` tool to generate the farewell. Do not engage in any other conversation or tasks.",
-        tools=[tools_util.say_goodbye],
+        tools=[basic_tools.say_goodbye],
     )
     logger.info(
         "Agent created: %s using model: %s", farewell_agent.name, farewell_agent.model
@@ -76,7 +77,7 @@ if greeting_agent and farewell_agent:
         model=get_model(root_agent_model),
         description="The main coordinator agent. Handles weather requests and delegates greetings/farewells to specialists.",
         instruction="Use the `get_weather` tool ONLY for specific weather requests (e.g., `weather in London`). You have specialized sub-agents: 1. `greeting_agent`: Handles simple greetings like `Hi`, `Hello`. Delegate to it for these. 2. `farewell_agent`: Handles simple farewells like `Bye`, `Goodbye`. Delegate to it for these. Analyze the user's query. If it's a greeting, delegate to `greeting_agent`. If it is a farewell, delegate to `farewell_agent`. If it is a weather request, handle it yourself using `get_weather`. For anything else, respond appropriately or state you cannot handle it.",
-        tools=[tools_util.get_weather],
+        tools=[basic_tools.get_weather],
         sub_agents=[greeting_agent, farewell_agent],
     )
     logger.info(
@@ -166,12 +167,15 @@ async def run_conversation():
             break
         await call_agent_async(user_input, runner, USER_ID, SESSION_ID)
 
-root_agent_var_name = 'root_agent'
-if 'weather_agent_team' in globals():
-    root_agent_var_name = 'weather_agent_team'
+
+root_agent_var_name = "root_agent"
+if "weather_agent_team" in globals():
+    root_agent_var_name = "weather_agent_team"
 else:
-    logger.error("Root Agent ('root_agent' or 'weather_agent_team') not found. Cannot define run_team_conversation.")
-    root_agent = None # Or set a flag to prevent execution
+    logger.error(
+        "Root Agent ('root_agent' or 'weather_agent_team') not found. Cannot define run_team_conversation."
+    )
+    root_agent = None  # Or set a flag to prevent execution
 
 if root_agent_var_name in globals() and globals()[root_agent_var_name]:
     # Define the main async function for the conversation logic.
@@ -193,25 +197,32 @@ if root_agent_var_name in globals() and globals()[root_agent_var_name]:
             app_name=APP_NAME, user_id=USER_ID, session_id=SESSION_ID
         )
         logger.info(
-            "Session created: App=%s, User=%s, Session=%s", APP_NAME, USER_ID, SESSION_ID
+            "Session created: App=%s, User=%s, Session=%s",
+            APP_NAME,
+            USER_ID,
+            SESSION_ID,
         )
 
         actual_root_agent = globals()[root_agent_var_name]
         logger.info("Root Agent: %s", actual_root_agent)
         # Runner
-        runner = Runner(agent=actual_root_agent, session_service=session_svc, app_name=APP_NAME)
+        runner = Runner(
+            agent=actual_root_agent, session_service=session_svc, app_name=APP_NAME
+        )
         logger.info(
             "Runner created: App=%s, User=%s, Session=%s", APP_NAME, USER_ID, SESSION_ID
         )
         while True:
             user_input = input("User: ")
-            await call_agent_async(user_input, runner, USER_ID, SESSION_ID)
             if user_input.lower() == "exit":
                 break
+            await call_agent_async(user_input, runner, USER_ID, SESSION_ID)
         logger.info("-- Agent Team Delegation Test Completed --")
+
 
 def main():
     asyncio.run(run_team_conversation())
+
 
 if __name__ == "__main__":
     # asyncio.run(run_conversation())

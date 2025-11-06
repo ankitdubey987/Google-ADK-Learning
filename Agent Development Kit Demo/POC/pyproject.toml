@@ -33,3 +33,4 @@ namespace = true
 agent_team = "agent_team.agent:main"
 stock_agent = "stock_advisor_workflow.agent:run_stock_advisor_workflow_sync"
 weather_agent = "weather_time_tool_agent.agent:run_stock_advisor_workflow_sync"
+stateful_agent_team = "agent_team.stateful_agents:main"
